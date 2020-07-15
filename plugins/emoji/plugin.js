@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2020, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
@@ -185,117 +185,10 @@
 				},
 				createEmojiBlock: function() {
 					var output = [];
-
-					// (#2607)
-					this.loadSVGNavigationIcons();
-
-					output.push( this.createGroupsNavigation() );
-					output.push( this.createSearchSection() );
 					output.push( this.createEmojiListBlock() );
 					output.push( this.createStatusBar() );
 
 					return '<div class="cke_emoji-inner_panel">' + output.join( '' ) + '</div>';
-				},
-				createGroupsNavigation: function() {
-					var itemTemplate,
-						items,
-						imgUrl,
-						useAttr;
-
-					if ( !this.editor.plugins.emoji.isSVGSupported() ) {
-						imgUrl = CKEDITOR.getUrl( this.plugin.path + 'assets/iconsall.png' );
-
-						itemTemplate = new CKEDITOR.template(
-							'<li class="cke_emoji-navigation_item" data-cke-emoji-group="{group}">' +
-							'<a href="#" draggable="false" _cke_focus="1" title="{name}">' +
-							'<span style="background-image:url(' + imgUrl + ');' +
-							'background-repeat:no-repeat;background-position:{positionX}px {positionY}px;"></span>' +
-							'</a></li>'
-						);
-
-						items = arrTools.reduce( this.groups, function( acc, item ) {
-							if ( !item.items.length ) {
-								return acc;
-							} else {
-								return acc + itemTemplate.output( {
-									group: htmlEncode( item.name ),
-									name: htmlEncode( item.sectionName ),
-									positionX: item.position.x,
-									positionY: item.position.y
-								} );
-							}
-						}, '' );
-					} else {
-						// iOS has problem with reading `href` attribute, that's why,
-						// its necessary to use `xlink:href` even its deprecated: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href
-						useAttr = CKEDITOR.env.safari ? 'xlink:href="#{svgId}"' : 'href="#{svgId}"';
-
-						itemTemplate = new CKEDITOR.template(
-							'<li class="cke_emoji-navigation_item" data-cke-emoji-group="{group}"><a href="#" title="{name}" draggable="false" _cke_focus="1">' +
-							'<svg viewBox="0 0 34 34" aria-labelledby="{svgId}-title">' +
-							'<title id="{svgId}-title">{name}</title><use ' + useAttr + '></use></svg></a></li>'
-						);
-
-						items = arrTools.reduce( this.groups, function( acc, item ) {
-							if ( !item.items.length ) {
-								return acc;
-							} else {
-								return acc + itemTemplate.output( {
-									group: htmlEncode( item.name ),
-									name: htmlEncode( item.sectionName ),
-									svgId: htmlEncode( item.svgId ),
-									translateX: item.translate && item.translate.x ? htmlEncode( item.translate.x ) : 0,
-									translateY: item.translate && item.translate.y ? htmlEncode( item.translate.y ) : 0
-								} );
-							}
-						}, '' );
-					}
-
-					this.listeners.push( {
-						selector: 'nav',
-						event: 'click',
-						listener: function( event ) {
-							var activeElement = event.data.getTarget().getAscendant( 'li', true );
-							if ( !activeElement ) {
-								return;
-							}
-							arrTools.forEach( this.elements.navigationItems.toArray(), function( node ) {
-								if ( node.equals( activeElement ) ) {
-									node.addClass( 'active' );
-								} else {
-									node.removeClass( 'active' );
-								}
-							} );
-
-							this.clearSearchAndMoveFocus( activeElement );
-
-							event.data.preventDefault();
-						}
-					} );
-
-					return '<nav aria-label="' + htmlEncode( this.lang.navigationLabel ) + '"><ul>' + items + '</ul></nav>';
-				},
-				createSearchSection: function() {
-					var self = this;
-
-					this.listeners.push( {
-						selector: 'input',
-						event: 'input',
-						listener: ( function() {
-							var buffer = CKEDITOR.tools.throttle( 200, self.filter, self );
-							return buffer.input;
-						} )()
-					} );
-					this.listeners.push( {
-						selector: 'input',
-						event: 'click',
-						listener: function() {
-							this.blockObject._.markItem( this.inputIndex );
-						}
-					} );
-					return '<label class="cke_emoji-search">' + this.getLoupeIcon() +
-						'<input placeholder="' + htmlEncode( this.lang.searchPlaceholder ) +
-						'" type="search" aria-label="' + htmlEncode( this.lang.searchLabel ) + '" role="search" _cke_focus="1"></label>';
 				},
 				createEmojiListBlock: function() {
 					var self = this;
@@ -342,17 +235,6 @@
 						'<p class="cke_emoji-status_description"></p><p class="cke_emoji-status_full_name"></p>' +
 						'</div>';
 				},
-				getLoupeIcon: function() {
-					var loupePngUrl = CKEDITOR.getUrl( this.plugin.path + 'assets/iconsall.png' ),
-						useAttr;
-
-					if ( !this.editor.plugins.emoji.isSVGSupported() ) {
-						return '<span class="cke_emoji-search_loupe" aria-hidden="true" style="background-image:url(' + loupePngUrl + ');"></span>';
-					} else {
-						useAttr = CKEDITOR.env.safari ? 'xlink:href="#cke4-icon-emoji-10"' : 'href="#cke4-icon-emoji-10"';
-						return '<svg viewBox="0 0 34 34" role="img" aria-hidden="true" class="cke_emoji-search_loupe"><use ' + useAttr + '></use></svg>';
-					}
-				},
 				getEmojiSections: function() {
 					return arrTools.reduce( this.groups, function( acc, item ) {
 						// If group is empty skip it.
@@ -368,7 +250,7 @@
 						sectionName = htmlEncode( item.sectionName ),
 						group = this.getEmojiListGroup( item.items );
 
-					return '<section data-cke-emoji-group="' + groupName + '" ><h2 id="' + groupName + '">' + sectionName + '</h2><ul>' + group + '</ul></section>';
+					return '<section data-cke-emoji-group="' + groupName + '" ><h2 id="' + groupName + '">' + '</h2><ul>' + group + '</ul></section>';
 				},
 				getEmojiListGroup: function( items ) {
 					var emojiTpl = new CKEDITOR.template( '<li class="cke_emoji-item">' +
@@ -379,11 +261,10 @@
 					return arrTools.reduce(
 						items,
 						function( acc, item ) {
-							addEncodedName( item );
 							return acc + emojiTpl.output( {
 									symbol: htmlEncode( item.symbol ),
 									id: htmlEncode( item.id ),
-									name: item.name,
+									name: htmlEncode( item.id.replace( /::.*$/, ':' ).replace( /^:|:$/g, '' ).replace( /_/g, ' ' ) ),
 									group: htmlEncode( item.group ),
 									keywords: htmlEncode( ( item.keywords || [] ).join( ',' ) )
 								} );
@@ -459,15 +340,6 @@
 						self.elements.emojiBlock.$.scrollTop = 0;
 						self.refreshNavigationStatus();
 
-						// Clear search results:
-						self.clearSearchInput();
-
-						// Reset focus:
-						CKEDITOR.tools.setTimeout( function() {
-							self.elements.input.focus( true );
-							self.blockObject._.markItem( self.inputIndex );
-						}, 0, self );
-
 						// Remove statusbar icons:
 						self.clearStatusbar();
 					};
@@ -508,48 +380,11 @@
 					this.elements.statusDescription.setText( '' );
 					this.elements.statusName.setText( '' );
 				},
-				clearSearchAndMoveFocus: function( activeElement ) {
-					this.clearSearchInput();
-					this.moveFocus( activeElement.data( 'cke-emoji-group' ) );
-				},
-				moveFocus: function( groupName ) {
-					var firstSectionItem = this.blockElement.findOne( 'a[data-cke-emoji-group="' + htmlEncode( groupName ) + '"]' ),
-						itemIndex;
-
-					if ( !firstSectionItem ) {
-						return;
-					}
-
-					itemIndex = this.getItemIndex( this.items, firstSectionItem );
-					firstSectionItem.focus( true );
-					firstSectionItem.getAscendant( 'section' ).getFirst().scrollIntoView( true );
-					this.blockObject._.markItem( itemIndex );
-				},
 				getItemIndex: function( nodeList, item ) {
 					return arrTools.indexOf( nodeList.toArray(), function( element ) {
 						return element.equals( item );
 					} );
 				},
-
-				// To avoid CORS issues due to XML based SVG icons, they should be loaded into panel document.
-				// This method ensures that the icons are loaded locally.
-				loadSVGNavigationIcons: function() {
-					if ( !this.editor.plugins.emoji.isSVGSupported() ) {
-						return;
-					}
-
-					var doc = this.blockElement.getDocument();
-
-					CKEDITOR.ajax.load( CKEDITOR.getUrl( this.plugin.path + 'assets/iconsall.svg' ), function( html ) {
-						var container = new CKEDITOR.dom.element( 'div' );
-
-						container.addClass( 'cke_emoji-navigation_icons' );
-						container.setHtml( html );
-
-						doc.getBody().append( container );
-					} );
-				},
-
 				addEmojiToGroups: function() {
 					var groupObj = {};
 					arrTools.forEach( this.groups, function( group ) {
@@ -570,12 +405,8 @@
 		icons: 'emojipanel',
 		hidpi: true,
 
-		isSupportedEnvironment: function() {
-			return !CKEDITOR.env.ie || CKEDITOR.env.version >= 11;
-		},
-
 		beforeInit: function() {
-			if ( !this.isSupportedEnvironment() ) {
+			if ( CKEDITOR.env.ie && CKEDITOR.env.version < 11 ) {
 				return;
 			}
 			if ( !stylesLoaded ) {
@@ -585,7 +416,7 @@
 		},
 
 		init: function( editor ) {
-			if ( !this.isSupportedEnvironment() ) {
+			if ( CKEDITOR.env.ie && CKEDITOR.env.version < 11 ) {
 				return;
 			}
 
@@ -620,7 +451,7 @@
 					editor._.emoji.autocomplete = new CKEDITOR.plugins.autocomplete( editor, {
 						textTestCallback: getTextTestCallback(),
 						dataCallback: dataCallback,
-						itemTemplate: '<li data-id="{id}" class="cke_emoji-suggestion_item"><span>{symbol}</span> {name}</li>',
+						itemTemplate: '<li data-id="{id}" class="cke_emoji-suggestion_item">{symbol} {id}</li>',
 						outputTemplate: '{symbol}'
 					} );
 				}
@@ -662,7 +493,6 @@
 								return a.id > b.id ? 1 : -1;
 							}
 						} );
-					data = arrTools.map( data, addEncodedName );
 					callback( data );
 				}
 			} );
@@ -677,19 +507,8 @@
 				new EmojiDropdown( editor, this );
 			}
 
-		},
-
-		isSVGSupported: function() {
-			return !CKEDITOR.env.ie || CKEDITOR.env.edge;
 		}
 	} );
-
-	function addEncodedName( item ) {
-		if ( !item.name ) {
-			item.name = htmlEncode( item.id.replace( /::.*$/, ':' ).replace( /^:|:$/g, '' ) );
-		}
-		return item;
-	}
 } )();
 
 /**
