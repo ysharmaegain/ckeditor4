@@ -10,13 +10,9 @@
 	font-family: sans-serif, Arial, Verdana, "Trebuchet MS", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
-.cke_emoji-suggestion_item span {
-	font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-}
-
 .cke_emoji-panel {
 	width: 310px;
-	height: 300px;
+	height: 168px;
 	overflow: hidden;
 }
 
@@ -35,14 +31,11 @@
 }
 
 /* TOP NAVIGATION */
-.cke_emoji-navigation_icons {
-	display: none;
-}
 .cke_emoji-inner_panel > nav {
 	width: 100%;
 	height: 24px;
 	margin-top: 10px;
-	margin-bottom: 6px;
+	margin-bottom: 4px;
 	padding-bottom: 4px;
 	border-bottom: 1px solid #d1d1d1;
 }
@@ -90,56 +83,9 @@
 	display: inline-block;
 }
 
-/* SEARCHBOX */
-.cke_emoji-search {
-	position: relative;
-	height: 25px;
-	display: block;
-	border: 1px solid #d1d1d1;
-	margin-left: 10px;
-	margin-right: 10px;
-}
-
-.cke_emoji-search .cke_emoji-search_loupe {
-	position: absolute;
-	top: 6px;
-	left: 6px;
-	display: inline-block;
-	width: 14px;
-	height: 14px;
-	opacity: 0.4;
-}
-
-.cke_rtl .cke_emoji-search .cke_emoji-search_loupe {
-	left: auto;
-	right: 6px;
-}
-
-.cke_emoji-search span {
-    background-repeat: no-repeat;
-    background-position: -60px -15px;
-	background-size: 75px 30px;
-}
-
-.cke_emoji-search input {
-	-webkit-appearance: none;
-	border: none;
-	width: 100%;
-	height: 100%;
-	padding-left: 25px;
-	padding-right: 10px;
-	margin-left: 0
-}
-
-.cke_rtl .cke_emoji-search input {
-	padding-left: 10px;
-	padding-right: 25px;
-	margin-right: 0;
-}
-
 /* EMOJI */
 .cke_emoji-outer_emoji_block {
-	height: 180px;
+	height: 128px;
 	overflow-x: hidden;
 	overflow-y: auto;
 	margin-top: 5px;
@@ -188,11 +134,11 @@
 
 /* STATUS BAR */
 .cke_emoji-status_bar {
-	height: 34px;
+	height: 36px;
 	padding-left: 10px;
 	padding-right: 10px;
 	padding-top: 3px;
-	margin-top: 3px;
+	margin-top: 1px;
 	border-top: 1px solid #d1d1d1;
 	line-height: 1;
 }
